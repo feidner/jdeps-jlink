@@ -2,14 +2,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <parent>
-        <groupId>hfe</groupId>
-        <artifactId>webstart.client</artifactId>
-        <version>1</version>
-    </parent>
-    <modelVersion>4.0.0</modelVersion>
 
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>hfe</groupId>
     <artifactId>webstart.client.jar</artifactId>
+    <version>1</version>
 
     <properties>
         <jlink.modules.paths>${env.JAVA_HOME}/jmods;${project.build.directory}/ulc.core.client-8.0.5.1.jar;${project.build.directory}/webstart.client.jar-1.jar</jlink.modules.paths>
@@ -18,7 +15,7 @@
         <jlink.launch>webstart.client.jar/hfe.Standalone</jlink.launch>
         <jlink.arg.line>--module-path ${jlink.modules.paths} --add-modules ${jlink.add.modules} --output ${jlink.out} --compress=2 --launcher launch=${jlink.launch} --no-header-files --no-man-pages --strip-debug</jlink.arg.line>
 
-        <nsis.path>nsis</nsis.path>
+        <nsis.path>nsis</nsis.path> <!-- use mvn clean package -Dnsis.path -->
     </properties>
 
     <dependencies>
