@@ -44,6 +44,7 @@
                                 <filter>
                                     <artifact>*:*</artifact>
                                     <excludes>
+                                        <!-- here I'm going to throw out some Classes I dont't need -->
                                         <exlude>com/canoo/common/logging/Log4J*.class</exlude>
                                         <exlude>com/ulcjava/environment/applet/**</exlude>
                                         <exlude>com/ulcjava/environment/jnlp/**</exlude>
@@ -68,8 +69,7 @@
                         </goals>
                         <configuration>
                             <target>
-                                <!--echo message="-generate-module-info ${project.build.directory}/generated ${project.build.directory}/${project.build.finalName}"/-->
-                                <!-- jdeps generate-module-info generated ulc-core-client-8.0.5.1.jar -->
+
                                 <mkdir dir="${project.build.directory}/generated"/>
 
                                 <echo message="${env.JAVA_HOME}/bin/jdeps ${jdeps.arg.line}"/>
@@ -78,7 +78,7 @@
                                        failonerror="true">
                                     <arg line="${jdeps.arg.line}"/>
                                 </exec>
-                                <!-- javac -patch-module ulc.core.client=ulc-core-client-8.0.5.1.jar generated/module-info.java -->
+
                                 <echo message="${env.JAVA_HOME}/bin/javac ${javac.arg.line}"/>
                                 <exec  dir="${project.basedir}"
                                        executable="${env.JAVA_HOME}/bin/javac"
