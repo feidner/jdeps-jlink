@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+    <version>1</version>
+
+    <groupId>hfe</groupId>
+    <artifactId>transform-thirdparty-lib-to-module-lib</artifactId>
+    <packaging>jar</packaging>
+
+
+    <dependencies>
+        <dependency>
+            <groupId>com.canoo.ulc</groupId>
+            <artifactId>ulc-core-client</artifactId>
+            <version>8.0.5.1</version>
+        </dependency>
+    </dependencies>
+
+    <properties>
+        <ulc.file.name>ulc-client.jar</ulc.file.name>
+    </properties>
+    <build>
+        <plugins>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.2.1</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <createDependencyReducedPom>false</createDependencyReducedPom>
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exlude>com/canoo/common/logging/Log4J*.class</exlude>
+                                        <exlude>com/ulcjava/environment/applet/**</exlude>
+                                        <exlude>com/ulcjava/environment/jnlp/**</exlude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.8</version>
+                <executions>
+                    <execution>
+                        <id>jdeps</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <!--echo message="-generate-module-info ${project.build.directory}/generated ${project.build.directory}/${project.build.finalName}"/-->
+                                <!-- jdeps generate-module-info generated ulc-core-client-8.0.5.1.jar -->
+                                <exec  dir="${project.basedir}"
+                                       executable="${env.JAVA_HOME}/bin/jdeps"
+                                       failonerror="true">
+                                    <arg line="--generate-module-info ${project.build.directory}/generated ${project.build.directory}/${project.build.finalName}.jar"/>
+                                </exec>
+                                <!-- javac -patch-module ulc.core.client=ulc-core-client-8.0.5.1.jar generated/module-info.java -->
+                                <exec  dir="${project.basedir}"
+                                       executable="${env.JAVA_HOME}/bin/javac"
+                                       failonerror="true">
+                                    <arg line="-d ${project.build.directory}
+                                        --patch-module kopiere.dependencies=${project.build.directory}/${project.build.finalName}.jar
+                                        ${project.build.directory}/generated/${project.name}/module-info.java"/>
+                                </exec>
+
+                                <exec  dir="${project.build.directory}"
+                                       executable="${env.JAVA_HOME}/bin/jar"
+                                       failonerror="true">
+                                    <arg line="-f ${project.build.directory}/${project.build.finalName}.jar
+                                        -u module-info.class"/>
+                                </exec>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jlink-plugin</artifactId>
+                <version>3.0.0-alpha-2-SNAPSHOT</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <addModules>
+                        <addModule>mod1</addModule>
+                        <addModule>first</addModule>
+                        .
+                        .
+                    </addModules>
+                    <noHeaderFiles>true</noHeaderFiles>
+                    <noManPages>true</noManPages>
+                </configuration>
+            </plugin>
+
+            <!--plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>com.canoo.ulc</groupId>
+                                    <artifactId>ulc-core-client</artifactId>
+                                    <version>8.0.5.1</version>
+                                </artifactItem>
+                            </artifactItems>
+                            <outputDirectory>${project.build.directory}/${ulc.file.name}</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin-->
+
+
+        </plugins>
+    </build>
+
+    <!--repositories>
+        <repository>
+            <id>nexus-beta</id>
+            <url>https://nexus.bedatadriven.com/content/repositories/public/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories-->
+    <pluginRepositories>
+        <pluginRepository>
+            <id>apache-snap</id>
+            <url>https://repository.apache.org/content/repositories/snapshots/</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </pluginRepository>
+    </pluginRepositories>
+
+</project>
