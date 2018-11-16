@@ -7,7 +7,7 @@
     <version>1</version>
 
     <groupId>hfe</groupId>
-    <artifactId>transform-thirdparty-lib-to-module-lib</artifactId>
+    <artifactId>transform.thirdparty.lib.to.module.lib</artifactId>
     <packaging>jar</packaging>
 
 
@@ -20,8 +20,11 @@
     </dependencies>
 
     <properties>
-        <ulc.file.name>ulc-client.jar</ulc.file.name>
+        <jar.arg.line>-f ${project.build.directory}/${project.build.finalName}.jar -u module-info.class</jar.arg.line>
+        <javac.arg.line>-d ${project.build.directory} --patch-module ${project.artifactId}=${project.build.directory}/${project.build.finalName}.jar ${project.build.directory}/generated/${project.artifactId}/module-info.java</javac.arg.line>
+        <jdeps.arg.line>--generate-module-info ${project.build.directory}/generated ${project.build.directory}/${project.build.finalName}.jar</jdeps.arg.line>
     </properties>
+
     <build>
         <plugins>
 
@@ -67,47 +70,32 @@
                             <target>
                                 <!--echo message="-generate-module-info ${project.build.directory}/generated ${project.build.directory}/${project.build.finalName}"/-->
                                 <!-- jdeps generate-module-info generated ulc-core-client-8.0.5.1.jar -->
+                                <mkdir dir="${project.build.directory}/generated"/>
+
+                                <echo message="${env.JAVA_HOME}/bin/jdeps ${jdeps.arg.line}"/>
                                 <exec  dir="${project.basedir}"
                                        executable="${env.JAVA_HOME}/bin/jdeps"
                                        failonerror="true">
-                                    <arg line="--generate-module-info ${project.build.directory}/generated ${project.build.directory}/${project.build.finalName}.jar"/>
+                                    <arg line="${jdeps.arg.line}"/>
                                 </exec>
                                 <!-- javac -patch-module ulc.core.client=ulc-core-client-8.0.5.1.jar generated/module-info.java -->
+                                <echo message="${env.JAVA_HOME}/bin/javac ${javac.arg.line}"/>
                                 <exec  dir="${project.basedir}"
                                        executable="${env.JAVA_HOME}/bin/javac"
                                        failonerror="true">
-                                    <arg line="-d ${project.build.directory}
-                                        --patch-module kopiere.dependencies=${project.build.directory}/${project.build.finalName}.jar
-                                        ${project.build.directory}/generated/${project.name}/module-info.java"/>
+                                    <arg line="${javac.arg.line}"/>
                                 </exec>
 
+                                <echo message="${env.JAVA_HOME}/bin/jar ${jar.arg.line}"/>
                                 <exec  dir="${project.build.directory}"
                                        executable="${env.JAVA_HOME}/bin/jar"
                                        failonerror="true">
-                                    <arg line="-f ${project.build.directory}/${project.build.finalName}.jar
-                                        -u module-info.class"/>
+                                    <arg line="${jar.arg.line}"/>
                                 </exec>
                             </target>
                         </configuration>
                     </execution>
                 </executions>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jlink-plugin</artifactId>
-                <version>3.0.0-alpha-2-SNAPSHOT</version>
-                <extensions>true</extensions>
-                <configuration>
-                    <addModules>
-                        <addModule>mod1</addModule>
-                        <addModule>first</addModule>
-                        .
-                        .
-                    </addModules>
-                    <noHeaderFiles>true</noHeaderFiles>
-                    <noManPages>true</noManPages>
-                </configuration>
             </plugin>
 
             <!--plugin>
