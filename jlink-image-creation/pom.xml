@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <groupId>hfe</groupId>
+        <artifactId>webstart.client</artifactId>
+        <version>1</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>webstart.client.jar</artifactId>
+
+    <properties>
+        <jlink.modules.paths>${env.JAVA_HOME}/jmods;${project.build.directory}/ulc.core.client-8.0.5.1.jar;${project.build.directory}/webstart.client.jar-1.jar</jlink.modules.paths>
+        <jlink.add.modules>ulc.core.client,webstart.client.jar</jlink.add.modules>
+        <jlink.out>${project.build.directory}/jlink-out</jlink.out>
+        <jlink.launch>webstart.client.jar/hfe.Standalone</jlink.launch>
+        <jlink.arg.line>--module-path ${jlink.modules.paths} --add-modules ${jlink.add.modules} --output ${jlink.out} --compress=2 --launcher launch=${jlink.launch} --no-header-files --no-man-pages --strip-debug</jlink.arg.line>
+
+        <nsis.path>nsis</nsis.path>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>hfe</groupId>
+            <artifactId>ulc.core.client</artifactId>
+            <version>8.0.5.1</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <!-- Compiler plugin definition -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.8.0</version>
+                    <configuration>
+                        <source>11</source>
+                        <target>11</target>
+                        <useIncrementalCompilation>false</useIncrementalCompilation>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
+        <plugins>
+
+            <plugin>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                            <artifactItem>
+                                <groupId>hfe</groupId>
+                                <artifactId>ulc.core.client</artifactId>
+                            </artifactItem>
+                            </artifactItems>
+                            <outputDirectory>${project.build.directory}</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+        <plugin>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <version>1.8</version>
+            <executions>
+                <execution>
+                    <id>jlink</id>
+                    <phase>package</phase>
+                    <goals>
+                        <goal>run</goal>
+                    </goals>
+                    <configuration>
+                        <target>
+
+                            <delete dir="${jlink.out}"/>
+
+                            <echo message="${env.JAVA_HOME}/bin/jlink ${jlink.arg.line}"/>
+                            <exec  dir="${project.basedir}"
+                                   executable="${env.JAVA_HOME}/bin/jlink"
+                                   failonerror="true">
+                                <arg line="${jlink.arg.line}"/>
+                            </exec>
+
+
+                            <echo message="${nsis.path}/makensis.exe script.nsi"/>
+                            <exec  dir="${project.build.directory}"
+                                   executable="${nsis.path}/makensis.exe"
+                                   failonerror="true">
+                                <arg line="${project.basedir}/script.nsi"/>
+                            </exec>
+                        </target>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
+        </plugins>
+    </build>
+
+</project>
