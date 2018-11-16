@@ -5,6 +5,7 @@ ShowInstDetails hide
 # define the name of the installer
 Outfile "target/ulc-client.exe"
 
+
 # define the directory to install to, the desktop in this case as specified
 # by the predefined $DESKTOP variable
 #InstallDir $DESKTOP
