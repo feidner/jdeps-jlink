@@ -11,51 +11,25 @@
     <packaging>jar</packaging>
 
 
+    <properties>
+        <module.name>ulc.core.client</module.name>
+        <module.version>8.0.5.1</module.version>
+        <jdeps.arg.line>--generate-module-info ${project.build.directory}/generated ${project.build.directory}/${module.name}.jar</jdeps.arg.line>
+        <javac.arg.line>-d ${project.build.directory} --patch-module ${module.name}=${project.build.directory}/${module.name}.jar ${project.build.directory}/generated/${module.name}/module-info.java</javac.arg.line>
+        <jar.arg.line>-f ${project.build.directory}/${module.name}.jar -u module-info.class</jar.arg.line>
+    </properties>
+
+
     <dependencies>
         <dependency>
             <groupId>com.canoo.ulc</groupId>
             <artifactId>ulc-core-client</artifactId>
-            <version>8.0.5.1</version>
+            <version>${module.version}</version>
         </dependency>
     </dependencies>
 
-    <properties>
-        <jar.arg.line>-f ${project.build.directory}/${project.build.finalName}.jar -u module-info.class</jar.arg.line>
-        <javac.arg.line>-d ${project.build.directory} --patch-module ${project.artifactId}=${project.build.directory}/${project.build.finalName}.jar ${project.build.directory}/generated/${project.artifactId}/module-info.java</javac.arg.line>
-        <jdeps.arg.line>--generate-module-info ${project.build.directory}/generated ${project.build.directory}/${project.build.finalName}.jar</jdeps.arg.line>
-    </properties>
-
     <build>
         <plugins>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>3.2.1</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                        <configuration>
-                            <createDependencyReducedPom>false</createDependencyReducedPom>
-                            <filters>
-                                <filter>
-                                    <artifact>*:*</artifact>
-                                    <excludes>
-                                        <!-- here I'm going to throw out some Classes I dont't need -->
-                                        <exlude>com/canoo/common/logging/Log4J*.class</exlude>
-                                        <exlude>com/ulcjava/environment/applet/**</exlude>
-                                        <exlude>com/ulcjava/environment/jnlp/**</exlude>
-                                    </excludes>
-                                </filter>
-                            </filters>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
 
             <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
@@ -63,7 +37,7 @@
                 <executions>
                     <execution>
                         <id>jdeps</id>
-                        <phase>package</phase>
+                        <phase>post-integration-test</phase>
                         <goals>
                             <goal>run</goal>
                         </goals>
@@ -96,6 +70,64 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.2.1</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <finalName>${module.name}</finalName>
+                            <createDependencyReducedPom>false</createDependencyReducedPom>
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <!-- here I'm going to throw out some Classes I dont't need -->
+                                        <exlude>com/canoo/common/logging/Log4J*.class</exlude>
+                                        <exlude>com/ulcjava/environment/applet/**</exlude>
+                                        <exlude>com/ulcjava/environment/jnlp/**</exlude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-install-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>install-file</goal>
+                        </goals>
+                        <configuration>
+                            <file>${project.build.directory}/${module.name}.jar</file>
+                            <generatePom>true</generatePom>
+                            <packaging>jar</packaging>
+                            <version>${module.version}</version>
+                            <groupId>hfe</groupId>
+                            <artifactId>${module.name}</artifactId>
+                        </configuration>
+                    </execution>
+                </executions>
+
+
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-install-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
             </plugin>
 
             <!--plugin>
