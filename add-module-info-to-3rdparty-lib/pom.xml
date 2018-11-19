@@ -7,26 +7,20 @@
     <version>1</version>
 
     <groupId>hfe</groupId>
-    <artifactId>transform.thirdparty.lib.to.module.lib</artifactId>
-    <packaging>jar</packaging>
+    <artifactId>add-module-info-to-3rdparty-lib</artifactId>
+    <packaging>pom</packaging>
 
 
     <properties>
-        <module.name>ulc.core.client</module.name>
-        <module.version>8.0.5.1</module.version>
-        <jdeps.arg.line>--generate-module-info ${project.build.directory}/generated ${project.build.directory}/${module.name}.jar</jdeps.arg.line>
-        <javac.arg.line>-d ${project.build.directory} --patch-module ${module.name}=${project.build.directory}/${module.name}.jar ${project.build.directory}/generated/${module.name}/module-info.java</javac.arg.line>
-        <jar.arg.line>-f ${project.build.directory}/${module.name}.jar -u module-info.class</jar.arg.line>
+        <module.groupid>hfe</module.groupid>
+        <jdeps.module.path/>
+        <jdeps.arg.line>${jdeps.module.path} --generate-module-info ${project.build.directory}/generated ${project.build.directory}/${project.artifactId}-${project.version}.jar</jdeps.arg.line>
+        <javac.arg.line>${jdeps.module.path} -d ${project.build.directory} --patch-module ${module.name}=${project.build.directory}/${project.artifactId}-${project.version}.jar ${project.build.directory}/generated/${module.name}/module-info.java</javac.arg.line>
+        <jar.arg.line>-f ${project.build.directory}/${project.artifactId}-${project.version}.jar -u module-info.class</jar.arg.line>
+
+
     </properties>
 
-
-    <dependencies>
-        <dependency>
-            <groupId>com.canoo.ulc</groupId>
-            <artifactId>ulc-core-client</artifactId>
-            <version>${module.version}</version>
-        </dependency>
-    </dependencies>
 
     <build>
         <plugins>
@@ -74,60 +68,34 @@
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>3.2.1</version>
+                <artifactId>maven-install-plugin</artifactId>
+                <version>2.5.2</version>
                 <executions>
                     <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
+                        <id>ins</id>
+                        <goals><goal>install</goal></goals>
                         <configuration>
-                            <finalName>${module.name}</finalName>
-                            <createDependencyReducedPom>false</createDependencyReducedPom>
-                            <filters>
-                                <filter>
-                                    <artifact>*:*</artifact>
-                                    <excludes>
-                                        <!-- here I'm going to throw out some Classes I dont't need -->
-                                        <exlude>com/canoo/common/logging/Log4J*.class</exlude>
-                                        <exlude>com/ulcjava/environment/applet/**</exlude>
-                                        <exlude>com/ulcjava/environment/jnlp/**</exlude>
-                                    </excludes>
-                                </filter>
-                            </filters>
+                            <skip>true</skip>
                         </configuration>
                     </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
-                <artifactId>maven-install-plugin</artifactId>
-                <executions>
                     <execution>
+                        <id>instf</id>
                         <phase>install</phase>
                         <goals>
                             <goal>install-file</goal>
                         </goals>
                         <configuration>
-                            <file>${project.build.directory}/${module.name}.jar</file>
+                            <file>${project.build.directory}/${project.artifactId}-${project.version}.jar</file>
                             <generatePom>true</generatePom>
                             <packaging>jar</packaging>
-                            <version>${module.version}</version>
-                            <groupId>hfe</groupId>
-                            <artifactId>${module.name}</artifactId>
+                            <version>${project.version}</version>
+                            <groupId>${project.groupId}</groupId>
+                            <artifactId>${project.artifactId}</artifactId>
                         </configuration>
                     </execution>
                 </executions>
 
 
-            </plugin>
-
-            <plugin>
-                <artifactId>maven-install-plugin</artifactId>
-                <configuration>
-                    <skip>true</skip>
-                </configuration>
             </plugin>
 
             <!--plugin>

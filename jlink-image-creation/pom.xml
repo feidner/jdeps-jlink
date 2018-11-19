@@ -9,8 +9,8 @@
     <version>1</version>
 
     <properties>
-        <jlink.modules.paths>${env.JAVA_HOME}/jmods;${project.build.directory}/ulc.core.client-8.0.5.1.jar;${project.build.directory}/webstart.client.jar-1.jar</jlink.modules.paths>
-        <jlink.add.modules>ulc.core.client,webstart.client.jar</jlink.add.modules>
+        <jlink.modules.paths>${env.JAVA_HOME}/jmods;${project.build.directory}/great.client-2029.0.10-SNAPSHOT.jar;${project.build.directory}/webstart.client.jar-1.jar</jlink.modules.paths>
+        <jlink.add.modules>great.client,webstart.client.jar</jlink.add.modules>
         <jlink.out>${project.build.directory}/jlink-out</jlink.out>
         <jlink.launch>webstart.client.jar/hfe.Standalone</jlink.launch>
         <jlink.arg.line>--module-path ${jlink.modules.paths} --add-modules ${jlink.add.modules} --output ${jlink.out} --compress=2 --launcher launch=${jlink.launch} --no-header-files --no-man-pages --strip-debug</jlink.arg.line>
@@ -20,9 +20,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>hfe</groupId>
-            <artifactId>ulc.core.client</artifactId>
-            <version>8.0.5.1</version>
+            <groupId>great</groupId>
+            <artifactId>great.client</artifactId>
+            <version>2029.0.10-SNAPSHOT</version>
         </dependency>
     </dependencies>
 
@@ -55,8 +55,8 @@
                         <configuration>
                             <artifactItems>
                             <artifactItem>
-                                <groupId>hfe</groupId>
-                                <artifactId>ulc.core.client</artifactId>
+                                <groupId>great</groupId>
+                                <artifactId>great.client</artifactId>
                             </artifactItem>
                             </artifactItems>
                             <outputDirectory>${project.build.directory}</outputDirectory>
