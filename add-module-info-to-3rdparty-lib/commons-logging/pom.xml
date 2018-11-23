@@ -6,9 +6,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>hfe.modules</groupId>
-    <artifactId>ulc-core-client</artifactId>
-    <version>9.0.RELEASE</version>
-
+    <artifactId>commons-logging</artifactId>
+    <version>1.2</version>
     <packaging>jar</packaging>
 
     <parent>
@@ -19,31 +18,18 @@
 
 
     <properties>
-        <module.name>ulc.core.client</module.name>
+        <module.name>commons.logging</module.name>
     </properties>
 
 
     <dependencies>
         <dependency>
-            <groupId>com.canoo.ulc</groupId>
-            <artifactId>ulc-core-client</artifactId>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
             <version>${project.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>junit</groupId>
-                    <artifactId>junit</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>commons-beanutils</groupId>
-                    <artifactId>commons-beanutils</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>commons-logging</groupId>
-                    <artifactId>commons-logging</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
     </dependencies>
+
 
     <build>
         <plugins>
@@ -64,11 +50,8 @@
                                 <filter>
                                     <artifact>*:*</artifact>
                                     <excludes>
-                                        <!-- here I'm going to throw out some Classes I dont't need -->
-                                        <exclude>com/canoo/common/logging/Log4J*</exclude>
-                                        <exclude>com/ulcjava/environment/applet/**</exclude>
-                                        <exclude>com/ulcjava/environment/jnlp/**</exclude>
-
+                                        <exlude>org/apache/commons/logging/impl/**</exlude>
+                                        <exlude>org/apache/commons/logging/LogSource*</exlude>
                                     </excludes>
                                 </filter>
                             </filters>

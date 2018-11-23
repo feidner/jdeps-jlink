@@ -4,11 +4,9 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
-
     <groupId>hfe.modules</groupId>
-    <artifactId>ulc-core-client</artifactId>
-    <version>9.0.RELEASE</version>
-
+    <artifactId>jgoodies-looks</artifactId>
+    <version>2.7.0</version>
     <packaging>jar</packaging>
 
     <parent>
@@ -19,30 +17,17 @@
 
 
     <properties>
-        <module.name>ulc.core.client</module.name>
+        <module.name>jgoodies.looks</module.name>
     </properties>
 
 
     <dependencies>
         <dependency>
-            <groupId>com.canoo.ulc</groupId>
-            <artifactId>ulc-core-client</artifactId>
+            <groupId>com.jgoodies</groupId>
+            <artifactId>jgoodies-looks</artifactId>
             <version>${project.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>junit</groupId>
-                    <artifactId>junit</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>commons-beanutils</groupId>
-                    <artifactId>commons-beanutils</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>commons-logging</groupId>
-                    <artifactId>commons-logging</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
+
     </dependencies>
 
     <build>
@@ -58,17 +43,14 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
-                            <finalName>${artifactId}-${project.version}</finalName>
+                            <finalName>${project.artifactId}-${project.version}</finalName>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
                             <filters>
                                 <filter>
                                     <artifact>*:*</artifact>
                                     <excludes>
                                         <!-- here I'm going to throw out some Classes I dont't need -->
-                                        <exclude>com/canoo/common/logging/Log4J*</exclude>
-                                        <exclude>com/ulcjava/environment/applet/**</exclude>
-                                        <exclude>com/ulcjava/environment/jnlp/**</exclude>
-
+                                        <exclude>META-INF/services/**</exclude>
                                     </excludes>
                                 </filter>
                             </filters>

@@ -12,19 +12,15 @@
 
 
     <properties>
-        <module.groupid>hfe</module.groupid>
         <jdeps.module.path/>
         <jdeps.arg.line>${jdeps.module.path} --generate-module-info ${project.build.directory}/generated ${project.build.directory}/${project.artifactId}-${project.version}.jar</jdeps.arg.line>
         <javac.arg.line>${jdeps.module.path} -d ${project.build.directory} --patch-module ${module.name}=${project.build.directory}/${project.artifactId}-${project.version}.jar ${project.build.directory}/generated/${module.name}/module-info.java</javac.arg.line>
         <jar.arg.line>-f ${project.build.directory}/${project.artifactId}-${project.version}.jar -u module-info.class</jar.arg.line>
-
-
     </properties>
 
 
     <build>
         <plugins>
-
             <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <version>1.8</version>
@@ -41,23 +37,23 @@
                                 <mkdir dir="${project.build.directory}/generated"/>
 
                                 <echo message="${env.JAVA_HOME}/bin/jdeps ${jdeps.arg.line}"/>
-                                <exec  dir="${project.basedir}"
-                                       executable="${env.JAVA_HOME}/bin/jdeps"
-                                       failonerror="true">
+                                <exec dir="${project.basedir}"
+                                      executable="${env.JAVA_HOME}/bin/jdeps"
+                                      failonerror="true">
                                     <arg line="${jdeps.arg.line}"/>
                                 </exec>
 
                                 <echo message="${env.JAVA_HOME}/bin/javac ${javac.arg.line}"/>
-                                <exec  dir="${project.basedir}"
-                                       executable="${env.JAVA_HOME}/bin/javac"
-                                       failonerror="true">
+                                <exec dir="${project.basedir}"
+                                      executable="${env.JAVA_HOME}/bin/javac"
+                                      failonerror="true">
                                     <arg line="${javac.arg.line}"/>
                                 </exec>
 
                                 <echo message="${env.JAVA_HOME}/bin/jar ${jar.arg.line}"/>
-                                <exec  dir="${project.build.directory}"
-                                       executable="${env.JAVA_HOME}/bin/jar"
-                                       failonerror="true">
+                                <exec dir="${project.build.directory}"
+                                      executable="${env.JAVA_HOME}/bin/jar"
+                                      failonerror="true">
                                     <arg line="${jar.arg.line}"/>
                                 </exec>
                             </target>
@@ -65,79 +61,73 @@
                     </execution>
                 </executions>
             </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-install-plugin</artifactId>
-                <version>2.5.2</version>
-                <executions>
-                    <execution>
-                        <id>ins</id>
-                        <goals><goal>install</goal></goals>
-                        <configuration>
-                            <skip>true</skip>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>instf</id>
-                        <phase>install</phase>
-                        <goals>
-                            <goal>install-file</goal>
-                        </goals>
-                        <configuration>
-                            <file>${project.build.directory}/${project.artifactId}-${project.version}.jar</file>
-                            <generatePom>true</generatePom>
-                            <packaging>jar</packaging>
-                            <version>${project.version}</version>
-                            <groupId>${project.groupId}</groupId>
-                            <artifactId>${project.artifactId}</artifactId>
-                        </configuration>
-                    </execution>
-                </executions>
-
-
-            </plugin>
-
-            <!--plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>copy-dependencies</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>copy</goal>
-                        </goals>
-                        <configuration>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>com.canoo.ulc</groupId>
-                                    <artifactId>ulc-core-client</artifactId>
-                                    <version>8.0.5.1</version>
-                                </artifactItem>
-                            </artifactItems>
-                            <outputDirectory>${project.build.directory}/${ulc.file.name}</outputDirectory>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin-->
-
-
         </plugins>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-deploy-plugin</artifactId>
+                    <executions>
+                        <execution>
+                            <id>default-deploy</id>
+                            <phase>none</phase>
+                        </execution>
+                        <execution>
+                            <goals>
+                                <goal>deploy-file</goal>
+                            </goals>
+                            <phase>deploy</phase>
+                            <configuration>
+                                <file>${project.build.directory}/${project.build.finalName}.${project.packaging}</file>
+                                <generatePom>true</generatePom>
+                                <groupId>${project.groupId}</groupId>
+                                <artifactId>${project.artifactId}</artifactId>
+                                <version>${project.version}</version>
+                                <url>url</url>
+                                <repositoryId>archiva.internal</repositoryId>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-install-plugin</artifactId>
+                    <version>2.5.2</version>
+                    <executions>
+                        <execution>
+                            <id>ins</id>
+                            <goals>
+                                <goal>install</goal>
+                            </goals>
+                            <configuration>
+                                <skip>true</skip>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>instf</id>
+                            <phase>install</phase>
+                            <goals>
+                                <goal>install-file</goal>
+                            </goals>
+                            <configuration>
+                                <file>${project.build.directory}/${project.artifactId}-${project.version}.jar</file>
+                                <generatePom>true</generatePom>
+                                <packaging>jar</packaging>
+                                <version>${project.version}</version>
+                                <groupId>${project.groupId}</groupId>
+                                <artifactId>${project.artifactId}</artifactId>
+                            </configuration>
+                        </execution>
+                    </executions>
+
+
+                </plugin>
+
+            </plugins>
+        </pluginManagement>
     </build>
 
-    <!--repositories>
-        <repository>
-            <id>nexus-beta</id>
-            <url>https://nexus.bedatadriven.com/content/repositories/public/</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-    </repositories-->
     <pluginRepositories>
         <pluginRepository>
             <id>apache-snap</id>

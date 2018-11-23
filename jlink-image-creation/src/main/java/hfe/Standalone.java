@@ -5,41 +5,75 @@ import com.ulcjava.environment.standalone.client.CustomizableStandaloneLauncher;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
+import java.io.*;
+import java.net.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 public class Standalone extends CustomizableStandaloneLauncher {
 
+    private static String getMac() throws UnknownHostException, SocketException {
+        InetAddress ip = InetAddress.getLocalHost();
+        NetworkInterface network = NetworkInterface.getByInetAddress(ip);
+        byte[] mac = network.getHardwareAddress();
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < mac.length; i++) {
+            sb.append(String.format("%02X%s", mac[i], (i < mac.length - 1) ? "-" : ""));
+        }
+        return sb.toString();
+    }
+
     public static void main(String[] args) {
 
+        String urlString = args.length == 0 ? "http://localhost:8080" : args[0];
 
-        try(FileWriter writer = new FileWriter("c:/Temp/ulc.log")) {
-            writer.write("start\n");
-            Properties ps = new Properties();
-            writer.write("client.properties laden\n");
-            try (InputStream is = Standalone.class.getResourceAsStream(("/client.properties"))) {
-                ps.load(is);
-            } catch (Exception e) {
-                writer.write(e.getMessage() + "\n");
+        try {
+
+            Desktop dd = java.awt.Desktop.getDesktop();
+            dd.browse(new URI(urlString + "/login?mac=" + getMac()));
+
+            URL url = new URL(urlString + "/good");
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            Callable<String> call =  Executors.privilegedCallable(() -> {
+                String id = "no";
+                while(id.equals("no")) {
+                    try (InputStream is = con.getInputStream()) {
+                        try (BufferedReader reader = new BufferedReader(new InputStreamReader(is))) {
+                            StringBuilder sb = new StringBuilder();
+                            reader.lines().forEach(l -> sb.append(l).append("\n"));
+                            id = sb.toString();
+                        }
+                    }
+                    Thread.sleep(1000);
+                }
+                return id;
+
+            });
+            Future<String> ff = Executors.newSingleThreadExecutor().submit(call);
+            String valuesFromServlet = ff.get(10, TimeUnit.SECONDS);
+
+            String[] values = valuesFromServlet.split("\n");
+            String sessionId = values[0];
+            String codebase = values[1];
+
+            try(FileWriter writer = new FileWriter("c:/Temp/ulc.log")) {
+                writer.write(args.length + "\n");
+                writer.write("start\n");
+                String launchString = "url-string=" + codebase + "/hfe.ulc";
+                launchString += StringUtilities.isEmpty(sessionId) ? "" : ";jsessionid=" + sessionId;
+                writer.write(sessionId + "\n");
+                writer.write(launchString + "\n");
+                writer.flush();
+                Standalone launcher = new Standalone();
+                launcher.launch(new String[]{launchString});
+            } catch (IOException e) {
+                handle(e);
             }
-            writer.write("client.properties geladen\n");
-            writer.write(ps.toString() + "\n");
-            String sessionId = ps.getProperty("jsessionid");
-            String codebase = ps.getProperty("codebase");
-            String launchString = "url-string=" + codebase + "/hfe.ulc";
-            launchString += StringUtilities.isEmpty(sessionId) ? "" : ";jsessionid=" + sessionId;
-            writer.write(sessionId + "\n");
-            writer.write(launchString + "\n");
-            writer.flush();
-            Standalone launcher = new Standalone();
-            launcher.launch(new String[]{launchString});
-        } catch (IOException e) {
+        } catch(Exception e) {
             handle(e);
         }
-
-
     }
 
     private static void handle(Exception e) {
